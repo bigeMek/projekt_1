@@ -155,6 +155,5 @@ print(f'''LEN | {"OCCURRENCES".ljust(max_stars)} | NR.
 {line} ''')
 for vyskyt in sorted(set(graph)):
     count = graph.count(vyskyt)
-    
     print(f'{str(vyskyt).rjust(3)} | {("*" * count).ljust(max_stars)} | {str(count).rjust(2)}')
 
