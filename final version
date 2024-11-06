@@ -1,0 +1,160 @@
+
+author = '''
+projekt_1.py: první projekt do Engeto Online Python Akademie
+Martin Blahuš
+martinkuf@gmail.com
+
+patch notes v2:
+-odstraneno spoustu for cyklu, nektery zapis zkracen
+-vycisteni textu od interpunkce, to byl duvod spatneho pocitani slov, pri slicingu podle ' ' + predelane prikazy na pocitani textu
+-zkraceni zapisu delek promennych a jejich prevedeni na hvezdy do grafu
+
+patch notes v3:
+-oprava zobrazovani grafu, oprava zarovnani grafu do sloupcu (stale spatne)
+
+patch notes v4:
+-vychytane zarovnani | v grafu, kdyby text mel jen jednoznakove prvky, je nastavena minimalni sirka radku pro zarovnani
+-prepsany vsechny promenne do AJ
+-dopoznamkovane vysvetleni prace s kodem
+
+(˘-˘ 人)
+
+'''
+
+#import modulu pro praci s textem
+import string
+
+TEXTS = ['''
+Situated about 10 miles west of Kemmerer,
+Fossil Butte is a ruggedly impressive
+topographic feature that rises sharply
+some 1000 feet above Twin Creek Valley
+to an elevation of more than 7500 feet
+above sea level. The butte is located just
+north of US 30N and the Union Pacific Railroad,
+which traverse the valley.''',
+'''At the base of Fossil Butte are the bright
+red, purple, yellow and gray beds of the Wasatch
+Formation. Eroded portions of these horizontal
+beds slope gradually upward from the valley floor
+and steepen abruptly. Overlying them and extending
+to the top of the butte are the much steeper
+buff-to-white beds of the Green River Formation,
+which are about 300 feet thick.''',
+'''The monument contains 8198 acres and protects
+a portion of the largest deposit of freshwater fish
+fossils in the world. The richest fossil fish deposits
+are found in multiple limestone layers, which lie some
+100 feet below the top of the butte. The fossils
+represent several varieties of perch, as well as
+other freshwater genera and herring similar to those
+in modern oceans. Other fish such as paddlefish,
+garpike and stingray are also present.'''
+]
+
+
+line = 40 * '-'
+users = {
+    'bob': '123',
+    'ann': 'pass123',
+    'mike': 'password123',
+    'liz': 'pass123'
+    }
+#vyzadani uzivatelskeho jmena a hesla plus jeho kontrola
+def login():
+    username = input('Enter username \n').lower()
+    if not username in users: #pokud login nesedi, opakuje zadani loginu
+        print('Wrong login')
+        return login()
+    password = input('Enter Password \n').lower()
+    if users[username] == password: # pokud sedi vse, prechazime k vyberu textu
+        print(f'Welcome to the app {username}')
+        print(line)
+        return choose_text()
+    else: #pokud nesedi heslo, opakuje zadani loginu
+        print('Wrong password')
+        return login()
+
+
+
+#vyber textu a jeho ocisteni od znaku
+def choose_text():
+    print(f'We have {len(TEXTS)} texts to be analyzed.')
+    part_chose = input('Enter a number from 1 to 3 to choose a text \n')
+    if part_chose.isdigit() and 1 <= int(part_chose) <= len(TEXTS):
+        part = TEXTS[int(part_chose) - 1]
+        part = [slovo.strip(string.punctuation) for slovo in part.split()] #ocisteni splitnuteho textu metodou .punctuation
+        return part
+    else:
+        print(f'{part_chose} is not correct answer, choose number between 1 and {len(TEXTS)}') #pri spatnem zadani cisla casti textu opakuje zadani
+        return choose_text()  
+    
+chosen_text = login()  # ulozeni vybraného textu
+
+#promenne pro praci s daty ve vypisu
+word_count = []
+first_capital = []
+all_capital = []
+small_letters = []
+num_count = []
+
+
+#vyber zadanych dat a pridani do prazdnych listu
+for word in chosen_text:
+    if word.isalpha() or any(char.isdigit() for char in word):
+        word_count.append(word)
+
+    if word.istitle():
+        first_capital.append(word)
+
+    if word.isupper() and word.isalpha():
+        all_capital.append(word)
+
+    if word.islower():
+        small_letters.append(word)
+
+    if word.isdigit():
+        num_count.append(int(word))
+
+#soucet cisel        
+sum_total = sum(num_count)
+
+#prevedeni prvku listu na delku(len) prvku
+word_count = len(word_count)
+first_capital = len(first_capital)
+all_capital = len(all_capital)
+small_letters = len(small_letters)
+num_count = len(num_count)
+
+#tisk vypisu zadanych dat
+print(f'''
+{line}
+1. There are {word_count} words in the selected text.
+2. There are {first_capital} titlecase words.
+3. There are {all_capital} uppercase words.
+4. There are {small_letters} lowercase words.
+5. There are {num_count} numeric strings.
+The sum of all the numbers {sum_total}.
+{line}
+''')
+
+#prazny graf pro pridavani prvku
+graph = []
+
+#projede prvky ve vybranem textu, prevede prvky textu na jejich delky a prida je do promenne graph
+for word in chosen_text:
+    graph.append(len(word))
+
+#minimalni sirka sloupce v delce dle OCCURRENCES 
+min_stars_width = 11
+#maximalni sirka sloupce podle sirky nejdelsiho slova v textu
+max_stars = max(max(graph.count(vyskyt) for vyskyt in set(graph)), min_stars_width)    
+    
+# Výpis grafu plus jeho zarovnani dle | (osetreno proti prilis kratkym nebo naopak dlouhym prvkum) 
+print(f'''LEN | {"OCCURRENCES".ljust(max_stars)} | NR.
+{line} ''')
+for vyskyt in sorted(set(graph)):
+    count = graph.count(vyskyt)
+    
+    print(f'{str(vyskyt).rjust(3)} | {("*" * count).ljust(max_stars)} | {str(count).rjust(2)}')
+
